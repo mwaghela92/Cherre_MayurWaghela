@@ -7,16 +7,19 @@ Created on Mon Aug 12 17:34:24 2019
 """
 
 import flask
-from flask import request, jsonify
 import sqlite3
 from sqlite3 import Error
-import pandas as pd
 import numpy as np
 import sys
 
 sys.stdout.flush()
 
 def make_connection():
+    """
+    This function mskes a connection to a database and 
+    returns connection and cursor
+    """
+    
     try:
         conn = sqlite3.connect(
                 '/usr/local/bin/testdb.db')
@@ -32,6 +35,12 @@ def make_connection():
 
 
 def total_count(n, people_list): 
+    """
+    This function calculates the total number of records
+    to be fetched when a user has requested n top records
+    and there is a tie at the nth record
+    """
+    
     if n< len(people_list):
         j = 0  
         for i in range(n,len(people_list),1):
@@ -47,6 +56,35 @@ def total_count(n, people_list):
 
 
 def insertinto_frequest_browsers(c, conn, sql, people_list,n):
+    """
+    This function is used to insert data into frequest_browsers table.
+    The logic used in this function is as follows:
+    
+    1. make a string of names whose record is to be inserted to 
+    check their existence in the database (check_list_text)
+    
+    2. execute two queries to fetch all the names (duplicate_list)and 
+    their site visit counts (duplicate_list_sites)
+    
+    3. IF duplicate_list is empty:
+        then insert all the values in the database
+    Else 
+        for loop for all duplicate list entries which
+        - fetches the number of sites visited by the
+        person
+        - checks if the count in db is less (can check for not equal depending
+        on logic we decide)
+        - if yes, then updates the record
+        
+    4.Since all duplicate entries are updates, we find people_tobe_added
+    i.e. names of people different from the duplicate listand their 
+    site visit count
+    
+    5. Add people_tobe_added records in db
+    
+    
+    """
+    
     check_list = list()
     for i in range(len(people_list)):
         check_list.append(people_list[i][0])
@@ -141,12 +179,14 @@ def insertinto_frequest_browsers(c, conn, sql, people_list,n):
             
                 
  
-
+"""
+Till here we have upated the db, now we will write an api to 
+expose the result to the world i.e. on a web browser
+"""
 app = flask.Flask('__name__')
 app.config["DEBUG"] = True
 
 @app.route('/', methods=['GET'])
-
 
 def home():  
     conn,c = make_connection()
@@ -188,6 +228,10 @@ print('committed \n Code fully executed')
 
 
 """
+
+The below code has been kept to have a refernce of db and
+help in better explanation during discussion
+
 c.execute('''SELECT name FROM sqlite_master 
              WHERE type='table' 
              ORDER BY name;
