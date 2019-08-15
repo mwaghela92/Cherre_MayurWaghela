@@ -19,7 +19,7 @@ $docker image build -t <name_of_image>
 
 $docker run –p 5000:5000 <name_of_image>
 #This will create a container and run the scripts
-# you will see an address - http://0.0.0.0:5000/ in the logs. Navigate to the address 
-# and you will find the result of the required query exposed to the world
+#you will see an address - http://0.0.0.0:5000/ in the logs. Navigate to the address 
+#and you will find the result of the required query exposed to the world
 
 
